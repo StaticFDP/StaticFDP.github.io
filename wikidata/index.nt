@@ -1,0 +1,52 @@
+_:genid1 <http://www.w3.org/2000/01/rdf-schema#label> "FAIR Data Point Profile" .
+<https://fdp.wikipathways.org/> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/dcat#Resource> .
+<https://fdp.wikipathways.org/> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/dcat#DataService> .
+<https://fdp.wikipathways.org/> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/fdp/fdp-o#MetadataService> .
+<https://fdp.wikipathways.org/> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/fdp/fdp-o#FairDataPoint> .
+<https://fdp.wikipathways.org/> <http://www.w3.org/2000/01/rdf-schema#label> "Wikidata FAIR Data Point"@en .
+<https://fdp.wikipathways.org/> <http://www.w3.org/2000/01/rdf-schema#label> "Wikidata FAIR Data Punt"@nl .
+<https://fdp.wikipathways.org/> <http://purl.org/dc/terms/title> "FAIR Data Point for Wikidata" .
+<https://fdp.wikipathways.org/> <http://purl.org/dc/terms/conformsTo> <https://www.purl.org/fairtools/fdp/schema/0.1/fdpMetadata> .
+<https://fdp.wikipathways.org/> <http://purl.org/dc/terms/description> "This FAIR Data Point deployment is used to describe Wikidata." .
+<https://fdp.wikipathways.org/> <http://purl.org/dc/terms/hasVersion> "0.0.1" .
+<https://fdp.wikipathways.org/> <http://purl.org/dc/terms/license> <http://www.wikidata.org/entity/Q6938433> .
+<https://fdp.wikipathways.org/> <http://purl.org/dc/terms/publisher> <http://www.wikidata.org/entity/Q28381786> .
+<https://fdp.wikipathways.org/> <http://purl.org/dc/terms/conformsTo> _:genid1 .
+<https://fdp.wikipathways.org/> <http://purl.org/dc/terms/accessRights> <https://fdp.wikidata.org/#accessRights> .
+<https://fdp.wikipathways.org/> <http://purl.org/dc/terms/language> <http://id.loc.gov/vocabulary/iso639-1/en> .
+<https://fdp.wikipathways.org/> <http://purl.org/dc/terms/language> <http://id.loc.gov/vocabulary/iso639-1/nl> .
+<https://fdp.wikipathways.org/> <http://purl.org/dc/terms/language> <http://id.loc.gov/vocabulary/iso639-1/fr> .
+<https://fdp.wikipathways.org/> <http://purl.org/dc/terms/language> <http://id.loc.gov/vocabulary/iso639-1/it> .
+<https://fdp.wikipathways.org/> <http://purl.org/dc/terms/language> <http://id.loc.gov/vocabulary/iso639-1/de> .
+<https://fdp.wikipathways.org/> <https://w3id.org/fdp/fdp-o#metadataIssued> "2023-09-12T07:42:08.000Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
+<https://fdp.wikipathways.org/> <https://w3id.org/fdp/fdp-o#metadataModified> "2023-09-12T13:06:00.000Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
+<https://fdp.wikipathways.org/> <https://w3id.org/fdp/fdp-o#metadataCatalog> <https://fdp.wikipathways.org/catalog> .
+<https://wikipathways.org/> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Agent> .
+<https://wikipathways.org/> <http://xmlns.com/foaf/0.1/name> "Wikidata " .
+<https://fdp.wikipathways.org/#accessRights> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://purl.org/dc/terms/RightsStatement> .
+<https://fdp.wikipathways.org/#accessRights> <http://purl.org/dc/terms/description> "This resource has no access restriction" .
+<http://fdp.wikipathways.org/catalogs/> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/ldp#DirectContainer> .
+<http://fdp.wikipathways.org/catalogs/> <http://purl.org/dc/terms/title> "WikiPathways Catalogs" .
+<http://fdp.wikipathways.org/catalogs/> <http://www.w3.org/ns/ldp#hasMemberRelation> <https://w3id.org/fdp/fdpo#metadataCatalog> .
+<http://fdp.wikipathways.org/catalogs/> <http://www.w3.org/ns/ldp#membershipResource> <https://fdp.wikipathways.org/> .
+<http://fdp.wikipathways.org/catalogs/> <http://www.w3.org/ns/ldp#contains> <https://fdp.wikipathways.org/catalog/> .
+_:genid2 <http://www.w3.org/2000/01/rdf-schema#label> "Catalog Profile" .
+<https://fdp.wikipathways.org/catalog/> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/dcat#Catalog> .
+<https://fdp.wikipathways.org/catalog/> <http://www.w3.org/2000/01/rdf-schema#label> "WikiPathways Catalog" .
+<https://fdp.wikipathways.org/catalog/> <http://purl.org/dc/terms/title> "WikiPathways Catalog" .
+<https://fdp.wikipathways.org/catalog/> <http://xmlns.com/foaf/0.1/homePage> <https://data.wikipathways.org/> .
+<https://fdp.wikipathways.org/catalog/> <https://w3id.org/fdp/fdp-o#metadataIssued> "2023-03-10T07:42:08.000Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
+<https://fdp.wikipathways.org/catalog/> <https://w3id.org/fdp/fdp-o#metadataModified> "2023-09-10T13:06:00.000Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
+<https://fdp.wikipathways.org/catalog/> <http://purl.org/dc/terms/issued> "2023-03-10T07:42:08.000Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
+<https://fdp.wikipathways.org/catalog/> <http://purl.org/dc/terms/modified> "2023-09-10T13:06:00.000Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
+<https://fdp.wikipathways.org/catalog/> <http://purl.org/dc/terms/conformsTo> _:genid2 .
+<https://fdp.wikipathways.org/catalog/> <http://purl.org/dc/terms/isPartOf> <http://fdp.wikipathways.org/> .
+<https://fdp.wikipathways.org/catalog/> <http://www.w3.org/ns/dcat#dataset> <https://wikipathways.github.io/fdp/dataset/20230610/> .
+<https://fdp.wikipathways.org/dataset/20230610/> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/dcat#Dataset> .
+<https://fdp.wikipathways.org/dataset/20230610/> <http://purl.org/dc/terms/title> "WikiPathways 20230610" .
+<https://fdp.wikipathways.org/dataset/20230610/> <http://www.w3.org/ns/dcat#distribution> <https://wikipathways.github.io/fdp/dataset/20230610/gpml> .
+<https://fdp.wikipathways.org/dataset/20230610/> <http://www.w3.org/ns/dcat#distribution> <https://wikipathways.github.io/fdp/dataset/20230610/gmt> .
+<https://fdp.wikipathways.org/dataset/20230610/gpml> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/dcat#Distribution> .
+<https://fdp.wikipathways.org/dataset/20230610/gpml> <http://purl.org/dc/terms/title> "WikiPathways 20230910, GPML files" .
+<https://fdp.wikipathways.org/dataset/20230610/gmt> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/dcat#Distribution> .
+<https://fdp.wikipathways.org/dataset/20230610/gmt> <http://purl.org/dc/terms/title> "WikiPathways 20230910, GMT files" .
