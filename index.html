@@ -23,11 +23,13 @@
            color: var(--gray-9); background: #fff; line-height: 1.6; }
 
     /* ── Nav ── */
-    nav { background: var(--gray-9); color: #fff; padding: 0 2rem;
+    nav { background: #1a4a8a; color: #fff; padding: 0 2rem;
           display: flex; align-items: center; gap: 1.5rem; height: 56px; }
-    nav .brand { font-weight: 700; font-size: 1.1rem; color: #fff; text-decoration: none; }
-    nav .brand span { color: var(--green); }
-    nav a { color: #ccc; text-decoration: none; font-size: .9rem; }
+    nav .brand { font-weight: 700; font-size: 1.05rem; color: #fff; text-decoration: none;
+                 display: flex; align-items: center; gap: .5rem; }
+    nav .brand img { height: 30px; border-radius: 4px; }
+    nav .brand span { color: rgba(255,255,255,.65); font-weight: 400; font-size: .88em; }
+    nav a { color: rgba(255,255,255,.8); text-decoration: none; font-size: .9rem; }
     nav a:hover { color: #fff; }
     nav .spacer { flex: 1; }
 
@@ -122,7 +124,7 @@
 
 <!-- ── Nav ── -->
 <nav>
-  <a class="brand" href="/"><span>Static</span>FDP</a>
+  <a class="brand" href="/"><img src="https://koetai.semscape.org/static/anableps.jpg" alt="Koetai">Koetai <span>FAIR Data Points</span></a>
   <a href="#how-it-works">How it works</a>
   <a href="#registered-fdps">Registered FDPs</a>
   <a href="#demos">Demos</a>
