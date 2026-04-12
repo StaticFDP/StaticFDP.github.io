@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SPARQL Demo — StaticFDP Federation</title>
+  <meta name="description" content="Live SPARQL queries across FAIR Data Points registered in the StaticFDP index." />
+
+  <!-- YASQE (SPARQL query editor) + YASR (result visualiser) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/yasgui-yasqe@4.2.21/dist/yasqe.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/yasgui-yasr@4.2.21/dist/yasr.min.css" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --green:  #2ea44f;
+      --green-d:#22863a;
+      --blue:   #0969da;
+      --gray-1: #f6f8fa;
+      --gray-2: #eaeef2;
+      --gray-3: #d0d7de;
+      --gray-7: #57606a;
+      --gray-9: #1f2328;
+    }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+           color: var(--gray-9); background: #fff; }
+
+    /* nav */
+    nav { background: var(--gray-9); color: #fff; padding: 0 1.5rem;
+          display: flex; align-items: center; gap: 1.25rem; height: 52px; }
+    nav a { color: #ccc; text-decoration: none; font-size: .88rem; }
+    nav a:hover { color: #fff; }
+    nav .brand { font-weight: 700; color: #fff; font-size: 1rem; }
+    nav .brand span { color: var(--green); }
+    nav .spacer { flex: 1; }
+
+    /* hero band */
+    .band { background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+            color: #fff; padding: 2.5rem 1.5rem; }
+    .band h1 { font-size: 1.7rem; font-weight: 800; margin-bottom: .5rem; }
+    .band p  { color: #8b949e; max-width: 680px; font-size: .95rem; line-height: 1.7; }
+
+    /* layout */
+    .page { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; }
+    h2 { font-size: 1.15rem; font-weight: 700; margin-bottom: .8rem; }
+
+    /* query cards */
+    .query-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+                  gap: 1rem; margin-bottom: 2rem; }
+    .q-card { border: 1px solid var(--gray-3); border-radius: 8px; padding: 1rem;
+               cursor: pointer; transition: border-color .15s, box-shadow .15s; background: #fff; }
+    .q-card:hover { border-color: var(--green); box-shadow: 0 0 0 3px rgba(46,164,79,.12); }
+    .q-card.active { border-color: var(--green); background: #f0fff4; }
+    .q-card .q-icon { font-size: 1.4rem; margin-bottom: .4rem; }
+    .q-card h3 { font-size: .9rem; font-weight: 700; margin-bottom: .3rem; }
+    .q-card p  { font-size: .8rem; color: var(--gray-7); }
+
+    /* sources panel */
+    .sources { background: var(--gray-1); border: 1px solid var(--gray-3); border-radius: 8px;
+               padding: 1rem; margin-bottom: 1.5rem; }
+    .sources h3 { font-size: .9rem; font-weight: 700; margin-bottom: .6rem; }
+    .src-list { display: flex; flex-wrap: wrap; gap: .5rem; }
+    .src-tag  { display: inline-flex; align-items: center; gap: .3rem; font-size: .78rem;
+                background: #fff; border: 1px solid var(--gray-3); border-radius: 20px;
+                padding: .2rem .65rem; }
+    .src-dot  { width: 7px; height: 7px; border-radius: 50%; background: var(--green); }
+
+    /* editor wrapper */
+    #yasqe { border: 1px solid var(--gray-3); border-radius: 8px; overflow: hidden;
+              margin-bottom: 1.25rem; }
+    .run-row { display: flex; gap: .75rem; align-items: center; margin-bottom: 1.5rem; }
+    .btn { display: inline-flex; align-items: center; gap: .4rem; padding: .55rem 1.2rem;
+           border-radius: 6px; font-weight: 600; font-size: .9rem; cursor: pointer;
+           border: none; text-decoration: none; }
+    .btn-green { background: var(--green); color: #fff; }
+    .btn-green:hover { background: var(--green-d); }
+    .btn-outline { background: transparent; color: var(--gray-9);
+                   border: 1px solid var(--gray-3); }
+    .btn-outline:hover { border-color: #999; }
+    #status { font-size: .85rem; color: var(--gray-7); }
+    #status.running { color: #0550ae; }
+    #status.error   { color: #cf222e; }
+    #status.ok      { color: var(--green-d); }
+
+    /* results */
+    #yasr { border: 1px solid var(--gray-3); border-radius: 8px; overflow: hidden;
+             min-height: 120px; }
+
+    /* how it works */
+    .explainer { background: var(--gray-1); border-radius: 8px; padding: 1.5rem;
+                 margin-top: 2.5rem; font-size: .88rem; color: var(--gray-7); }
+    .explainer h3 { font-size: 1rem; color: var(--gray-9); font-weight: 700; margin-bottom: .75rem; }
+    .explainer ol { padding-left: 1.3rem; }
+    .explainer li { margin-bottom: .4rem; }
+    .explainer code { background: var(--gray-2); padding: .1rem .3rem; border-radius: 3px; font-size: .82rem; }
+
+    footer { border-top: 1px solid var(--gray-3); margin-top: 3rem; padding: 1.5rem;
+             text-align: center; font-size: .82rem; color: var(--gray-7); }
+    footer a { color: var(--blue); text-decoration: none; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="brand" href="/"><span>Static</span>FDP</a>
+  <a href="/">Home</a>
+  <a href="/#registered-fdps">FDP Index</a>
+  <a href="/ga4gh-rare-disease-trajectories/">BYOD Event</a>
+  <div class="spacer"></div>
+  <a href="https://github.com/StaticFDP" target="_blank">GitHub ↗</a>
+</nav>
+
+<div class="band">
+  <h1>🔎 SPARQL Federation across FAIR Data Points</h1>
+  <p>Run live SPARQL queries against RDF metadata from multiple registered FDPs. No server, no SPARQL endpoint to maintain — Comunica runs the engine entirely in your browser, fetching Turtle files directly from GitHub Pages.</p>
+</div>
+
+<div class="page">
+
+  <!-- ── Pre-built query cards ── -->
+  <h2>Choose a query</h2>
+  <div class="query-grid">
+    <div class="q-card active" onclick="loadQuery(0, this)">
+      <div class="q-icon">📋</div>
+      <h3>All datasets in the catalog</h3>
+      <p>List every dataset and its description across all registered FDP sources.</p>
+    </div>
+    <div class="q-card" onclick="loadQuery(1, this)">
+      <div class="q-icon">🦠</div>
+      <h3>Find datasets by disease</h3>
+      <p>Search for datasets mentioning a specific disease term — ORPHA, OMIM, or Mondo IRI.</p>
+    </div>
+    <div class="q-card" onclick="loadQuery(2, this)">
+      <div class="q-icon">📥</div>
+      <h3>Available distributions</h3>
+      <p>Show all downloadable files with their formats and access URLs.</p>
+    </div>
+    <div class="q-card" onclick="loadQuery(3, this)">
+      <div class="q-icon">👤</div>
+      <h3>Community submissions</h3>
+      <p>List disease cases submitted by the community via the BYOD web forms.</p>
+    </div>
+    <div class="q-card" onclick="loadQuery(4, this)">
+      <div class="q-icon">🔗</div>
+      <h3>Cross-FDP — all catalogs</h3>
+      <p>Federate across all registered FDP sources and list every catalog found.</p>
+    </div>
+  </div>
+
+  <!-- ── Data sources ── -->
+  <div class="sources">
+    <h3>Data sources (Turtle files served from GitHub Pages)</h3>
+    <div class="src-list" id="srcList">
+      <!-- populated by JS -->
+    </div>
+  </div>
+
+  <!-- ── YASQE editor ── -->
+  <div id="yasqe"></div>
+
+  <div class="run-row">
+    <button class="btn btn-green" onclick="runQuery()">▶ Run query</button>
+    <button class="btn btn-outline" onclick="copyQuery()">📋 Copy SPARQL</button>
+    <span id="status"></span>
+  </div>
+
+  <!-- ── YASR results ── -->
+  <div id="yasr"></div>
+
+  <!-- ── How it works ── -->
+  <div class="explainer">
+    <h3>How this works</h3>
+    <ol>
+      <li>Each registered FDP publishes a <code>catalog.ttl</code> file served via <strong>GitHub Pages</strong> — no server needed.</li>
+      <li><strong>Comunica</strong> (<a href="https://comunica.dev" target="_blank">comunica.dev</a>) is a standards-compliant SPARQL engine that runs entirely in your browser using Web Workers.</li>
+      <li>When you click <em>Run query</em>, Comunica fetches the listed Turtle files over HTTP, builds an in-memory RDF dataset, and evaluates your SPARQL SELECT or CONSTRUCT.</li>
+      <li>Results are rendered by <strong>YASR</strong> as a sortable table. You can also view raw JSON, pivot charts, or download as CSV.</li>
+      <li>You can edit the query freely — it is plain SPARQL 1.1. The <code>SERVICE</code> keyword lets you federate against external SPARQL endpoints too.</li>
+    </ol>
+  </div>
+
+</div>
+
+<footer>
+  <p>
+    <a href="/">StaticFDP home</a> ·
+    <a href="https://staticfdp.github.io/fdp-index/" target="_blank">FDP Index</a> ·
+    Powered by <a href="https://comunica.dev" target="_blank">Comunica</a> +
+    <a href="https://triply.cc/docs/yasgui/" target="_blank">YASGUI</a>
+  </p>
+</footer>
+
+<!-- ── Libraries ── -->
+<script src="https://cdn.jsdelivr.net/npm/yasgui-yasqe@4.2.21/dist/yasqe.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/yasgui-yasr@4.2.21/dist/yasr.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@comunica/query-sparql@3.2.2/browser/comunica-browser.js"></script>
+
+<script>
+// ── Registered FDP Turtle sources ────────────────────────────────────────────
+const SOURCES = [
+  {
+    label: "GA4GH BYOD Catalog",
+    url: "https://fdp.semscape.org/ga4gh-rare-disease-trajectories/fdp/catalog.ttl",
+    color: "#8250df"
+  },
+  {
+    label: "GA4GH BYOD Submissions",
+    url: "https://fdp.semscape.org/ga4gh-rare-disease-trajectories/fdp/submissions.ttl",
+    color: "#0969da"
+  }
+];
+
+// ── Pre-built queries ─────────────────────────────────────────────────────────
+const PREFIXES = `PREFIX dcat:    <https://www.w3.org/ns/dcat#>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX foaf:    <http://xmlns.com/foaf/0.1/>
+PREFIX ordo:    <http://www.orpha.net/ORDO/Orphanet_>
+PREFIX omim:    <https://omim.org/entry/>
+PREFIX hp:      <http://purl.obolibrary.org/obo/HP_>
+PREFIX mondo:   <http://purl.obolibrary.org/obo/MONDO_>
+PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>
+
+`;
+
+const QUERIES = [
+  // 0 — All datasets
+  PREFIXES + `SELECT ?dataset ?title ?description WHERE {
+  ?catalog a dcat:Catalog .
+  ?catalog dcat:dataset ?dataset .
+  ?dataset dcterms:title ?title .
+  OPTIONAL { ?dataset dcterms:description ?description }
+  FILTER(LANG(?title) = "en" || LANG(?title) = "")
+}
+ORDER BY ?title`,
+
+  // 1 — Datasets by disease
+  PREFIXES + `# Change the disease IRI to search for a different disease.
+# ORDO examples:  ordo:98895  (Duchenne)  ordo:803 (ALS)
+# Mondo examples: mondo:0004976 (ALS)     mondo:0010679 (Duchenne)
+
+SELECT ?dataset ?title ?diseaseIRI WHERE {
+  ?catalog a dcat:Catalog .
+  ?catalog dcat:dataset ?dataset .
+  ?dataset dcterms:title ?title .
+  ?dataset dcterms:subject ?diseaseIRI .
+  FILTER(LANG(?title) = "en" || LANG(?title) = "")
+}`,
+
+  // 2 — Distributions
+  PREFIXES + `SELECT ?dataset ?title ?format ?accessURL WHERE {
+  ?catalog a dcat:Catalog .
+  ?catalog dcat:dataset ?dataset .
+  ?dataset dcterms:title ?title .
+  ?dataset dcat:distribution ?dist .
+  ?dist dcterms:format ?format .
+  ?dist dcat:accessURL ?accessURL .
+  FILTER(LANG(?title) = "en" || LANG(?title) = "")
+}
+ORDER BY ?dataset`,
+
+  // 3 — Community submissions
+  PREFIXES + `PREFIX : <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/fdp/submissions/>
+
+SELECT ?case ?title ?contributor ?submittedVia ?issueURL WHERE {
+  ?case a dcat:Dataset .
+  ?case dcterms:title ?title .
+  OPTIONAL { ?case dcterms:creator ?contributor }
+  OPTIONAL { ?case dcat:landingPage ?issueURL }
+  OPTIONAL { ?case dcterms:source  ?submittedVia }
+}
+ORDER BY DESC(?case)`,
+
+  // 4 — Cross-FDP catalog listing
+  PREFIXES + `SELECT ?catalog ?title ?description ?publisher WHERE {
+  ?catalog a dcat:Catalog .
+  OPTIONAL { ?catalog dcterms:title ?title }
+  OPTIONAL { ?catalog dcterms:description ?description }
+  OPTIONAL {
+    ?catalog dcterms:publisher ?pub .
+    ?pub foaf:name ?publisher .
+  }
+  FILTER(LANG(?title) = "en" || LANG(?title) = "")
+}`
+];
+
+// ── Render source tags ────────────────────────────────────────────────────────
+function renderSources() {
+  const list = document.getElementById('srcList');
+  list.innerHTML = SOURCES.map(s => `
+    <span class="src-tag">
+      <span class="src-dot" style="background:${s.color}"></span>
+      <a href="${s.url}" target="_blank" title="${s.url}">${s.label}</a>
+    </span>
+  `).join('');
+}
+
+// ── YASQE init ────────────────────────────────────────────────────────────────
+let yasqe, yasr;
+
+window.addEventListener('DOMContentLoaded', () => {
+  renderSources();
+
+  yasqe = YASQE(document.getElementById('yasqe'), {
+    value: QUERIES[0],
+    lineNumbers: true,
+    theme: 'default',
+    requestConfig: { endpoint: '' },
+  });
+
+  yasr = new YASR(document.getElementById('yasr'), {
+    pluginOrder: ['table', 'rawResponse'],
+    defaultPlugin: 'table',
+  });
+});
+
+// ── Load pre-built query ──────────────────────────────────────────────────────
+function loadQuery(idx, card) {
+  document.querySelectorAll('.q-card').forEach(c => c.classList.remove('active'));
+  card.classList.add('active');
+  yasqe.setValue(QUERIES[idx]);
+}
+
+// ── Run query with Comunica ───────────────────────────────────────────────────
+async function runQuery() {
+  const status = document.getElementById('status');
+  status.className = 'running';
+  status.textContent = '⏳ Fetching sources and evaluating…';
+
+  try {
+    const sparql = yasqe.getValue();
+    const engine = new Comunica.QueryEngine();
+
+    const sources = SOURCES.map(s => ({ type: 'file', value: s.url }));
+
+    const bindingsStream = await engine.queryBindings(sparql, { sources });
+    const bindings = await bindingsStream.toArray();
+
+    if (bindings.length === 0) {
+      status.className = 'ok';
+      status.textContent = '✓ Query completed — 0 results';
+      yasr.setResponse({
+        results: { bindings: [] },
+        head: { vars: [] }
+      });
+      return;
+    }
+
+    // Convert Comunica bindings to YASR SPARQL-JSON format
+    const vars = [...bindings[0].keys()].map(k => k.value);
+    const rows = bindings.map(b => {
+      const row = {};
+      for (const v of vars) {
+        const term = b.get(v);
+        if (term) {
+          if (term.termType === 'NamedNode') {
+            row[v] = { type: 'uri', value: term.value };
+          } else if (term.termType === 'Literal') {
+            const obj = { type: 'literal', value: term.value };
+            if (term.language) obj['xml:lang'] = term.language;
+            if (term.datatype) obj.datatype = term.datatype.value;
+            row[v] = obj;
+          } else {
+            row[v] = { type: 'bnode', value: term.value };
+          }
+        }
+      }
+      return row;
+    });
+
+    yasr.setResponse({
+      head: { vars },
+      results: { bindings: rows }
+    });
+
+    status.className = 'ok';
+    status.textContent = `✓ ${rows.length} result${rows.length !== 1 ? 's' : ''}`;
+  } catch (err) {
+    status.className = 'error';
+    status.textContent = '✗ ' + err.message;
+    console.error(err);
+  }
+}
+
+// ── Copy SPARQL ───────────────────────────────────────────────────────────────
+function copyQuery() {
+  navigator.clipboard.writeText(yasqe.getValue())
+    .then(() => {
+      const s = document.getElementById('status');
+      s.className = 'ok';
+      s.textContent = '✓ Copied to clipboard';
+    });
+}
+</script>
+
+</body>
+</html>
