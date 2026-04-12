@@ -6,10 +6,6 @@
   <title>SPARQL Demo — StaticFDP Federation</title>
   <meta name="description" content="Live SPARQL queries across FAIR Data Points registered in the StaticFDP index." />
 
-  <!-- YASQE (SPARQL query editor) + YASR (result visualiser) -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/yasgui-yasqe@4.2.21/dist/yasqe.min.css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/yasgui-yasr@4.2.21/dist/yasr.min.css" />
-
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -21,82 +17,115 @@
       --gray-3: #d0d7de;
       --gray-7: #57606a;
       --gray-9: #1f2328;
+      --red:    #cf222e;
     }
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-           color: var(--gray-9); background: #fff; }
+           color: var(--gray-9); background: #fff; line-height: 1.5; }
 
     /* nav */
     nav { background: var(--gray-9); color: #fff; padding: 0 1.5rem;
-          display: flex; align-items: center; gap: 1.25rem; height: 52px; }
+          display: flex; align-items: center; gap: 1.25rem; height: 52px; flex-wrap: wrap; }
     nav a { color: #ccc; text-decoration: none; font-size: .88rem; }
     nav a:hover { color: #fff; }
     nav .brand { font-weight: 700; color: #fff; font-size: 1rem; }
     nav .brand span { color: var(--green); }
     nav .spacer { flex: 1; }
 
-    /* hero band */
+    /* hero */
     .band { background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
             color: #fff; padding: 2.5rem 1.5rem; }
-    .band h1 { font-size: 1.7rem; font-weight: 800; margin-bottom: .5rem; }
-    .band p  { color: #8b949e; max-width: 680px; font-size: .95rem; line-height: 1.7; }
+    .band h1 { font-size: 1.6rem; font-weight: 800; margin-bottom: .5rem; }
+    .band p  { color: #8b949e; max-width: 680px; font-size: .93rem; line-height: 1.7; }
 
     /* layout */
     .page { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; }
-    h2 { font-size: 1.15rem; font-weight: 700; margin-bottom: .8rem; }
+    h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: .75rem; }
 
     /* query cards */
-    .query-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-                  gap: 1rem; margin-bottom: 2rem; }
-    .q-card { border: 1px solid var(--gray-3); border-radius: 8px; padding: 1rem;
-               cursor: pointer; transition: border-color .15s, box-shadow .15s; background: #fff; }
-    .q-card:hover { border-color: var(--green); box-shadow: 0 0 0 3px rgba(46,164,79,.12); }
+    .query-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                  gap: .85rem; margin-bottom: 1.75rem; }
+    .q-card { border: 1px solid var(--gray-3); border-radius: 8px; padding: .9rem 1rem;
+               cursor: pointer; transition: border-color .15s, box-shadow .15s;
+               background: #fff; user-select: none; }
+    .q-card:hover  { border-color: var(--green); box-shadow: 0 0 0 3px rgba(46,164,79,.12); }
     .q-card.active { border-color: var(--green); background: #f0fff4; }
-    .q-card .q-icon { font-size: 1.4rem; margin-bottom: .4rem; }
-    .q-card h3 { font-size: .9rem; font-weight: 700; margin-bottom: .3rem; }
-    .q-card p  { font-size: .8rem; color: var(--gray-7); }
+    .q-card .qi { font-size: 1.3rem; margin-bottom: .35rem; }
+    .q-card h3  { font-size: .85rem; font-weight: 700; margin-bottom: .25rem; }
+    .q-card p   { font-size: .77rem; color: var(--gray-7); }
 
-    /* sources panel */
+    /* sources */
     .sources { background: var(--gray-1); border: 1px solid var(--gray-3); border-radius: 8px;
-               padding: 1rem; margin-bottom: 1.5rem; }
-    .sources h3 { font-size: .9rem; font-weight: 700; margin-bottom: .6rem; }
-    .src-list { display: flex; flex-wrap: wrap; gap: .5rem; }
-    .src-tag  { display: inline-flex; align-items: center; gap: .3rem; font-size: .78rem;
+               padding: .9rem 1rem; margin-bottom: 1.25rem; }
+    .sources strong { font-size: .85rem; }
+    .src-list { display: flex; flex-wrap: wrap; gap: .45rem; margin-top: .5rem; }
+    .src-tag  { display: inline-flex; align-items: center; gap: .3rem; font-size: .76rem;
                 background: #fff; border: 1px solid var(--gray-3); border-radius: 20px;
-                padding: .2rem .65rem; }
-    .src-dot  { width: 7px; height: 7px; border-radius: 50%; background: var(--green); }
+                padding: .18rem .6rem; }
+    .src-dot  { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
 
-    /* editor wrapper */
-    #yasqe { border: 1px solid var(--gray-3); border-radius: 8px; overflow: hidden;
-              margin-bottom: 1.25rem; }
-    .run-row { display: flex; gap: .75rem; align-items: center; margin-bottom: 1.5rem; }
-    .btn { display: inline-flex; align-items: center; gap: .4rem; padding: .55rem 1.2rem;
-           border-radius: 6px; font-weight: 600; font-size: .9rem; cursor: pointer;
-           border: none; text-decoration: none; }
-    .btn-green { background: var(--green); color: #fff; }
+    /* editor */
+    .editor-wrap { position: relative; margin-bottom: 1rem; }
+    #queryEditor {
+      width: 100%; height: 200px;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+      font-size: .82rem; line-height: 1.55;
+      border: 1px solid var(--gray-3); border-radius: 8px;
+      padding: .75rem 1rem; resize: vertical;
+      background: #0d1117; color: #e6edf3;
+      outline: none;
+    }
+    #queryEditor:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(9,105,218,.12); }
+
+    /* toolbar */
+    .toolbar { display: flex; gap: .6rem; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .btn { display: inline-flex; align-items: center; gap: .35rem; padding: .5rem 1.1rem;
+           border-radius: 6px; font-weight: 600; font-size: .88rem; cursor: pointer;
+           border: 1px solid transparent; transition: background .12s; }
+    .btn-green   { background: var(--green); color: #fff; }
     .btn-green:hover { background: var(--green-d); }
-    .btn-outline { background: transparent; color: var(--gray-9);
-                   border: 1px solid var(--gray-3); }
+    .btn-outline { background: #fff; color: var(--gray-9); border-color: var(--gray-3); }
     .btn-outline:hover { border-color: #999; }
-    #status { font-size: .85rem; color: var(--gray-7); }
+    .btn:disabled { opacity: .45; cursor: default; }
+    #status { font-size: .84rem; color: var(--gray-7); }
     #status.running { color: #0550ae; }
-    #status.error   { color: #cf222e; }
+    #status.err     { color: var(--red); }
     #status.ok      { color: var(--green-d); }
 
-    /* results */
-    #yasr { border: 1px solid var(--gray-3); border-radius: 8px; overflow: hidden;
-             min-height: 120px; }
+    /* results table */
+    #results { border: 1px solid var(--gray-3); border-radius: 8px; overflow: hidden;
+               min-height: 80px; }
+    #results .placeholder { padding: 1.5rem; color: var(--gray-7); font-size: .88rem; text-align: center; }
+    .result-meta { background: var(--gray-1); border-bottom: 1px solid var(--gray-3);
+                   padding: .5rem 1rem; font-size: .8rem; color: var(--gray-7);
+                   display: flex; justify-content: space-between; align-items: center; }
+    .result-meta a { color: var(--blue); font-size: .78rem; text-decoration: none; }
+    .result-meta a:hover { text-decoration: underline; }
+    .tbl-wrap { overflow-x: auto; }
+    table.results { width: 100%; border-collapse: collapse; font-size: .84rem; }
+    table.results th { background: var(--gray-1); font-weight: 600; text-align: left;
+                        padding: .5rem .75rem; border-bottom: 2px solid var(--gray-3);
+                        white-space: nowrap; }
+    table.results td { padding: .45rem .75rem; border-bottom: 1px solid var(--gray-2);
+                        vertical-align: top; max-width: 380px; word-break: break-all; }
+    table.results tr:last-child td { border-bottom: none; }
+    table.results tr:hover td { background: var(--gray-1); }
+    td.uri  a { color: var(--blue); text-decoration: none; }
+    td.uri  a:hover { text-decoration: underline; }
+    td.lit  { color: var(--gray-9); }
+    td.empty { color: var(--gray-7); font-style: italic; font-size: .78rem; }
 
-    /* how it works */
-    .explainer { background: var(--gray-1); border-radius: 8px; padding: 1.5rem;
-                 margin-top: 2.5rem; font-size: .88rem; color: var(--gray-7); }
-    .explainer h3 { font-size: 1rem; color: var(--gray-9); font-weight: 700; margin-bottom: .75rem; }
+    /* explainer */
+    .explainer { background: var(--gray-1); border-radius: 8px; padding: 1.25rem 1.5rem;
+                 margin-top: 2.5rem; font-size: .87rem; color: var(--gray-7); }
+    .explainer h3 { font-size: .97rem; color: var(--gray-9); font-weight: 700; margin-bottom: .65rem; }
     .explainer ol { padding-left: 1.3rem; }
-    .explainer li { margin-bottom: .4rem; }
-    .explainer code { background: var(--gray-2); padding: .1rem .3rem; border-radius: 3px; font-size: .82rem; }
+    .explainer li { margin-bottom: .35rem; }
+    code { background: var(--gray-2); padding: .1rem .3rem; border-radius: 3px; font-size: .82rem; }
 
-    footer { border-top: 1px solid var(--gray-3); margin-top: 3rem; padding: 1.5rem;
-             text-align: center; font-size: .82rem; color: var(--gray-7); }
+    footer { border-top: 1px solid var(--gray-3); margin-top: 3rem; padding: 1.25rem;
+             text-align: center; font-size: .81rem; color: var(--gray-7); }
     footer a { color: var(--blue); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
@@ -112,299 +141,318 @@
 
 <div class="band">
   <h1>🔎 SPARQL Federation across FAIR Data Points</h1>
-  <p>Run live SPARQL queries against RDF metadata from multiple registered FDPs. No server, no SPARQL endpoint to maintain — Comunica runs the engine entirely in your browser, fetching Turtle files directly from GitHub Pages.</p>
+  <p>Run live SPARQL queries against RDF metadata from multiple registered FDPs. No server needed — <a href="https://comunica.dev" target="_blank" style="color:#58a6ff;">Comunica</a> runs the SPARQL engine entirely in your browser, fetching Turtle files directly over HTTP.</p>
 </div>
 
 <div class="page">
 
-  <!-- ── Pre-built query cards ── -->
+  <!-- query cards -->
   <h2>Choose a query</h2>
   <div class="query-grid">
-    <div class="q-card active" onclick="loadQuery(0, this)">
-      <div class="q-icon">📋</div>
-      <h3>All datasets in the catalog</h3>
-      <p>List every dataset and its description across all registered FDP sources.</p>
+    <div class="q-card active" onclick="loadQuery(0,this)">
+      <div class="qi">📋</div>
+      <h3>All datasets</h3>
+      <p>List every dataset across all registered FDP sources.</p>
     </div>
-    <div class="q-card" onclick="loadQuery(1, this)">
-      <div class="q-icon">🦠</div>
-      <h3>Find datasets by disease</h3>
-      <p>Search for datasets mentioning a specific disease term — ORPHA, OMIM, or Mondo IRI.</p>
+    <div class="q-card" onclick="loadQuery(1,this)">
+      <div class="qi">🦠</div>
+      <h3>Find by disease IRI</h3>
+      <p>Datasets annotated with a specific ORDO, OMIM, or Mondo term.</p>
     </div>
-    <div class="q-card" onclick="loadQuery(2, this)">
-      <div class="q-icon">📥</div>
-      <h3>Available distributions</h3>
-      <p>Show all downloadable files with their formats and access URLs.</p>
+    <div class="q-card" onclick="loadQuery(2,this)">
+      <div class="qi">📥</div>
+      <h3>Distributions</h3>
+      <p>All downloadable files with formats and access URLs.</p>
     </div>
-    <div class="q-card" onclick="loadQuery(3, this)">
-      <div class="q-icon">👤</div>
+    <div class="q-card" onclick="loadQuery(3,this)">
+      <div class="qi">👤</div>
       <h3>Community submissions</h3>
-      <p>List disease cases submitted by the community via the BYOD web forms.</p>
+      <p>Disease cases submitted via the BYOD web forms.</p>
     </div>
-    <div class="q-card" onclick="loadQuery(4, this)">
-      <div class="q-icon">🔗</div>
-      <h3>Cross-FDP — all catalogs</h3>
-      <p>Federate across all 5 registered FDP sources and list every catalog found.</p>
+    <div class="q-card" onclick="loadQuery(4,this)">
+      <div class="qi">🔗</div>
+      <h3>Cross-FDP catalogs</h3>
+      <p>All catalogs found across every registered FDP source.</p>
     </div>
   </div>
 
-  <!-- ── Data sources ── -->
+  <!-- sources -->
   <div class="sources">
-    <h3>Data sources (Turtle files served from GitHub Pages)</h3>
-    <div class="src-list" id="srcList">
-      <!-- populated by JS -->
-    </div>
+    <strong>Data sources</strong> — Turtle fetched live from each FDP:
+    <div class="src-list" id="srcList"></div>
   </div>
 
-  <!-- ── YASQE editor ── -->
-  <div id="yasqe"></div>
+  <!-- editor -->
+  <div class="editor-wrap">
+    <textarea id="queryEditor" spellcheck="false" autocorrect="off" autocapitalize="off"></textarea>
+  </div>
 
-  <div class="run-row">
-    <button class="btn btn-green" onclick="runQuery()">▶ Run query</button>
+  <!-- toolbar -->
+  <div class="toolbar">
+    <button class="btn btn-green" id="runBtn" onclick="runQuery()">▶ Run query</button>
     <button class="btn btn-outline" onclick="copyQuery()">📋 Copy SPARQL</button>
     <span id="status"></span>
   </div>
 
-  <!-- ── YASR results ── -->
-  <div id="yasr"></div>
+  <!-- results -->
+  <div id="results">
+    <div class="placeholder">Results will appear here after you run a query.</div>
+  </div>
 
-  <!-- ── How it works ── -->
+  <!-- explainer -->
   <div class="explainer">
     <h3>How this works</h3>
     <ol>
-      <li>Each registered FDP publishes a <code>catalog.ttl</code> file served via <strong>GitHub Pages</strong> — no server needed.</li>
-      <li><strong>Comunica</strong> (<a href="https://comunica.dev" target="_blank">comunica.dev</a>) is a standards-compliant SPARQL engine that runs entirely in your browser using Web Workers.</li>
-      <li>When you click <em>Run query</em>, Comunica fetches the listed Turtle files over HTTP, builds an in-memory RDF dataset, and evaluates your SPARQL SELECT or CONSTRUCT.</li>
-      <li>Results are rendered by <strong>YASR</strong> as a sortable table. You can also view raw JSON, pivot charts, or download as CSV.</li>
-      <li>You can edit the query freely — it is plain SPARQL 1.1. The <code>SERVICE</code> keyword lets you federate against external SPARQL endpoints too.</li>
+      <li>Each registered FDP publishes one or more Turtle (<code>.ttl</code>) files served over HTTPS with open CORS headers — no dedicated SPARQL endpoint needed.</li>
+      <li><strong>Comunica</strong> is a W3C-standards-compliant SPARQL 1.1 engine compiled to a browser bundle. It fetches each source file, builds an in-memory RDF dataset, and evaluates your query.</li>
+      <li>Results are rendered as a sortable HTML table. URIs become clickable links.</li>
+      <li>You can freely edit the query in the editor above — it is plain SPARQL 1.1. Add <code>FILTER</code>, change variables, or add a <code>SERVICE</code> clause to federate against an external SPARQL endpoint.</li>
+      <li>For Demo 2, submit a disease case via the <a href="/ga4gh-rare-disease-trajectories/">BYOD form</a>, wait ~60 s for the GitHub Action to run, then run the <em>Community submissions</em> query above to see it appear here.</li>
     </ol>
   </div>
 
 </div>
 
 <footer>
-  <p>
-    <a href="/">StaticFDP home</a> ·
-    <a href="https://staticfdp.github.io/fdp-index/" target="_blank">FDP Index</a> ·
-    Powered by <a href="https://comunica.dev" target="_blank">Comunica</a> +
-    <a href="https://triply.cc/docs/yasgui/" target="_blank">YASGUI</a>
-  </p>
+  <a href="/">StaticFDP home</a> ·
+  <a href="https://staticfdp.github.io/fdp-index/" target="_blank">FDP Index</a> ·
+  Powered by <a href="https://comunica.dev" target="_blank">Comunica</a>
 </footer>
 
-<!-- ── Libraries ── -->
-<script src="https://cdn.jsdelivr.net/npm/yasgui-yasqe@4.2.21/dist/yasqe.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/yasgui-yasr@4.2.21/dist/yasr.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@comunica/query-sparql@3.2.2/browser/comunica-browser.js"></script>
+<!-- Comunica browser bundle (SPARQL engine) — only external dependency -->
+<script src="https://cdn.jsdelivr.net/npm/@comunica/query-sparql@2.10.1/browser/comunica-browser.js"></script>
 
 <script>
-// ── Registered FDP Turtle sources ────────────────────────────────────────────
+'use strict';
+
+// ── Data sources ──────────────────────────────────────────────────────────────
 const SOURCES = [
-  {
-    label: "GA4GH BYOD Catalog",
-    url: "https://fdp.semscape.org/ga4gh-rare-disease-trajectories/fdp/catalog.ttl",
-    color: "#8250df"
-  },
-  {
-    label: "GA4GH BYOD Submissions",
-    url: "https://fdp.semscape.org/ga4gh-rare-disease-trajectories/fdp/submissions.ttl",
-    color: "#0969da"
-  },
-  {
-    label: "Duchenne Data Foundation FDP",
-    url: "https://fdp.duchennedatafoundation.org",
-    color: "#2ea44f"
-  },
-  {
-    label: "WikiPathways FDP",
-    url: "https://fdp.wikipathways.org/index.ttl",
-    color: "#e57300"
-  },
-  {
-    label: "SPHN FDP (SIB Swiss)",
-    url: "https://fdp.dcc.sib.swiss",
-    color: "#cf222e"
-  }
+  { label: "GA4GH BYOD — catalog",     url: "https://fdp.semscape.org/ga4gh-rare-disease-trajectories/fdp/catalog.ttl",     color: "#8250df" },
+  { label: "GA4GH BYOD — submissions", url: "https://fdp.semscape.org/ga4gh-rare-disease-trajectories/fdp/submissions.ttl", color: "#0969da" },
+  { label: "Duchenne Data Foundation",  url: "https://fdp.duchennedatafoundation.org",                                       color: "#2ea44f" },
+  { label: "WikiPathways FDP",          url: "https://fdp.wikipathways.org/index.ttl",                                       color: "#e57300" },
+  { label: "SPHN FDP (SIB Swiss)",      url: "https://fdp.dcc.sib.swiss",                                                   color: "#cf222e" },
 ];
 
 // ── Pre-built queries ─────────────────────────────────────────────────────────
-const PREFIXES = `PREFIX dcat:    <https://www.w3.org/ns/dcat#>
+const PFX = `PREFIX dcat:    <https://www.w3.org/ns/dcat#>
 PREFIX dcterms: <http://purl.org/dc/terms/>
 PREFIX foaf:    <http://xmlns.com/foaf/0.1/>
 PREFIX ordo:    <http://www.orpha.net/ORDO/Orphanet_>
 PREFIX omim:    <https://omim.org/entry/>
 PREFIX hp:      <http://purl.obolibrary.org/obo/HP_>
 PREFIX mondo:   <http://purl.obolibrary.org/obo/MONDO_>
-PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>
 
 `;
 
 const QUERIES = [
-  // 0 — All datasets
-  PREFIXES + `SELECT ?dataset ?title ?description WHERE {
-  ?catalog a dcat:Catalog .
-  ?catalog dcat:dataset ?dataset .
+  // 0 — all datasets
+  PFX + `SELECT ?dataset ?title ?description WHERE {
+  ?catalog a dcat:Catalog ;
+           dcat:dataset ?dataset .
   ?dataset dcterms:title ?title .
   OPTIONAL { ?dataset dcterms:description ?description }
   FILTER(LANG(?title) = "en" || LANG(?title) = "")
 }
 ORDER BY ?title`,
 
-  // 1 — Datasets by disease
-  PREFIXES + `# Change the disease IRI to search for a different disease.
-# ORDO examples:  ordo:98895  (Duchenne)  ordo:803 (ALS)
-# Mondo examples: mondo:0004976 (ALS)     mondo:0010679 (Duchenne)
+  // 1 — by disease IRI
+  PFX + `# Change the disease IRI to search for a different disease.
+# ORDO:  ordo:98895 (Duchenne DMD)   ordo:803 (ALS)
+# Mondo: mondo:0004976 (ALS)         mondo:0010679 (DMD)
 
 SELECT ?dataset ?title ?diseaseIRI WHERE {
-  ?catalog a dcat:Catalog .
-  ?catalog dcat:dataset ?dataset .
-  ?dataset dcterms:title ?title .
-  ?dataset dcterms:subject ?diseaseIRI .
+  ?catalog a dcat:Catalog ;
+           dcat:dataset ?dataset .
+  ?dataset dcterms:title ?title ;
+           dcterms:subject ?diseaseIRI .
   FILTER(LANG(?title) = "en" || LANG(?title) = "")
 }`,
 
-  // 2 — Distributions
-  PREFIXES + `SELECT ?dataset ?title ?format ?accessURL WHERE {
-  ?catalog a dcat:Catalog .
-  ?catalog dcat:dataset ?dataset .
-  ?dataset dcterms:title ?title .
-  ?dataset dcat:distribution ?dist .
-  ?dist dcterms:format ?format .
-  ?dist dcat:accessURL ?accessURL .
-  FILTER(LANG(?title) = "en" || LANG(?title) = "")
+  // 2 — distributions
+  PFX + `SELECT ?datasetTitle ?format ?accessURL WHERE {
+  ?catalog a dcat:Catalog ;
+           dcat:dataset ?dataset .
+  ?dataset dcterms:title ?datasetTitle ;
+           dcat:distribution ?dist .
+  ?dist dcterms:format ?format ;
+        dcat:accessURL  ?accessURL .
+  FILTER(LANG(?datasetTitle) = "en" || LANG(?datasetTitle) = "")
 }
-ORDER BY ?dataset`,
+ORDER BY ?datasetTitle`,
 
-  // 3 — Community submissions
-  PREFIXES + `PREFIX : <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/fdp/submissions/>
-
-SELECT ?case ?title ?contributor ?submittedVia ?issueURL WHERE {
-  ?case a dcat:Dataset .
-  ?case dcterms:title ?title .
-  OPTIONAL { ?case dcterms:creator ?contributor }
+  // 3 — community submissions
+  PFX + `SELECT ?case ?title ?creator ?issueURL WHERE {
+  ?case a dcat:Dataset ;
+        dcterms:title ?title .
+  OPTIONAL { ?case dcterms:creator ?creator }
   OPTIONAL { ?case dcat:landingPage ?issueURL }
-  OPTIONAL { ?case dcterms:source  ?submittedVia }
+  FILTER(STRSTARTS(STR(?case), "https://fdp.semscape.org/ga4gh-rare-disease-trajectories/fdp/submissions/"))
 }
 ORDER BY DESC(?case)`,
 
-  // 4 — Cross-FDP catalog listing
-  PREFIXES + `SELECT ?catalog ?title ?description ?publisher WHERE {
+  // 4 — cross-FDP catalogs
+  PFX + `SELECT ?catalog ?title ?publisher WHERE {
   ?catalog a dcat:Catalog .
   OPTIONAL { ?catalog dcterms:title ?title }
-  OPTIONAL { ?catalog dcterms:description ?description }
   OPTIONAL {
     ?catalog dcterms:publisher ?pub .
     ?pub foaf:name ?publisher .
   }
-  FILTER(LANG(?title) = "en" || LANG(?title) = "")
-}`
+  FILTER(!BOUND(?title) || LANG(?title) = "en" || LANG(?title) = "")
+}`,
 ];
 
 // ── Render source tags ────────────────────────────────────────────────────────
 function renderSources() {
-  const list = document.getElementById('srcList');
-  list.innerHTML = SOURCES.map(s => `
-    <span class="src-tag">
-      <span class="src-dot" style="background:${s.color}"></span>
-      <a href="${s.url}" target="_blank" title="${s.url}">${s.label}</a>
-    </span>
-  `).join('');
+  document.getElementById('srcList').innerHTML = SOURCES.map(s =>
+    `<span class="src-tag">
+       <span class="src-dot" style="background:${s.color}"></span>
+       <a href="${s.url}" target="_blank">${s.label}</a>
+     </span>`
+  ).join('');
 }
-
-// ── YASQE init ────────────────────────────────────────────────────────────────
-let yasqe, yasr;
-
-window.addEventListener('DOMContentLoaded', () => {
-  renderSources();
-
-  yasqe = YASQE(document.getElementById('yasqe'), {
-    value: QUERIES[0],
-    lineNumbers: true,
-    theme: 'default',
-    requestConfig: { endpoint: '' },
-  });
-
-  yasr = new YASR(document.getElementById('yasr'), {
-    pluginOrder: ['table', 'rawResponse'],
-    defaultPlugin: 'table',
-  });
-});
 
 // ── Load pre-built query ──────────────────────────────────────────────────────
 function loadQuery(idx, card) {
   document.querySelectorAll('.q-card').forEach(c => c.classList.remove('active'));
   card.classList.add('active');
-  yasqe.setValue(QUERIES[idx]);
+  document.getElementById('queryEditor').value = QUERIES[idx];
 }
 
-// ── Run query with Comunica ───────────────────────────────────────────────────
+// ── Run query ─────────────────────────────────────────────────────────────────
 async function runQuery() {
-  const status = document.getElementById('status');
-  status.className = 'running';
-  status.textContent = '⏳ Fetching sources and evaluating…';
+  const statusEl = document.getElementById('status');
+  const runBtn   = document.getElementById('runBtn');
+  const sparql   = document.getElementById('queryEditor').value.trim();
+
+  if (!sparql) { setStatus('err', '✗ Query is empty'); return; }
+
+  if (typeof Comunica === 'undefined') {
+    setStatus('err', '✗ Comunica engine not loaded — check your internet connection and reload.');
+    return;
+  }
+
+  runBtn.disabled = true;
+  setStatus('running', '⏳ Fetching sources and evaluating…');
+  renderResults(null);  // clear
 
   try {
-    const sparql = yasqe.getValue();
-    const engine = new Comunica.QueryEngine();
-
-    const sources = SOURCES.map(s => ({ type: 'file', value: s.url }));
+    const engine  = new Comunica.QueryEngine();
+    const sources = SOURCES.map(s => s.url);
 
     const bindingsStream = await engine.queryBindings(sparql, { sources });
     const bindings = await bindingsStream.toArray();
 
     if (bindings.length === 0) {
-      status.className = 'ok';
-      status.textContent = '✓ Query completed — 0 results';
-      yasr.setResponse({
-        results: { bindings: [] },
-        head: { vars: [] }
-      });
+      setStatus('ok', '✓ Query completed — 0 results');
+      renderResults([]);
       return;
     }
 
-    // Convert Comunica bindings to YASR SPARQL-JSON format
+    // Collect variable names from first binding
     const vars = [...bindings[0].keys()].map(k => k.value);
+
+    // Convert to plain objects for rendering
     const rows = bindings.map(b => {
       const row = {};
       for (const v of vars) {
         const term = b.get(v);
-        if (term) {
-          if (term.termType === 'NamedNode') {
-            row[v] = { type: 'uri', value: term.value };
-          } else if (term.termType === 'Literal') {
-            const obj = { type: 'literal', value: term.value };
-            if (term.language) obj['xml:lang'] = term.language;
-            if (term.datatype) obj.datatype = term.datatype.value;
-            row[v] = obj;
-          } else {
-            row[v] = { type: 'bnode', value: term.value };
-          }
-        }
+        row[v] = term ? { type: term.termType, value: term.value } : null;
       }
       return row;
     });
 
-    yasr.setResponse({
-      head: { vars },
-      results: { bindings: rows }
-    });
+    renderResults(rows, vars);
+    setStatus('ok', `✓ ${rows.length} result${rows.length !== 1 ? 's' : ''}`);
 
-    status.className = 'ok';
-    status.textContent = `✓ ${rows.length} result${rows.length !== 1 ? 's' : ''}`;
   } catch (err) {
-    status.className = 'error';
-    status.textContent = '✗ ' + err.message;
+    setStatus('err', '✗ ' + err.message);
     console.error(err);
+  } finally {
+    runBtn.disabled = false;
   }
+}
+
+// ── Render results table ──────────────────────────────────────────────────────
+function renderResults(rows, vars) {
+  const container = document.getElementById('results');
+
+  if (rows === null) {
+    container.innerHTML = '<div class="placeholder">Running…</div>';
+    return;
+  }
+  if (rows.length === 0) {
+    container.innerHTML = '<div class="placeholder">No results for this query against the current sources.</div>';
+    return;
+  }
+
+  const escHtml = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+  function cellHtml(term) {
+    if (!term) return '<td class="empty">—</td>';
+    const v = term.value;
+    if (term.type === 'NamedNode') {
+      // Show a short label (last path segment or full IRI)
+      const label = v.replace(/.*[/#]/, '') || v;
+      return `<td class="uri"><a href="${escHtml(v)}" target="_blank" title="${escHtml(v)}">${escHtml(label)}</a></td>`;
+    }
+    return `<td class="lit">${escHtml(v)}</td>`;
+  }
+
+  const headerRow = vars.map(v => `<th>${escHtml(v)}</th>`).join('');
+  const bodyRows  = rows.map(r =>
+    '<tr>' + vars.map(v => cellHtml(r[v])).join('') + '</tr>'
+  ).join('');
+
+  container.innerHTML = `
+    <div class="result-meta">
+      <span>${rows.length} result${rows.length !== 1 ? 's' : ''}</span>
+      <a href="#" onclick="downloadCSV(event)">⬇ Download CSV</a>
+    </div>
+    <div class="tbl-wrap">
+      <table class="results">
+        <thead><tr>${headerRow}</tr></thead>
+        <tbody>${bodyRows}</tbody>
+      </table>
+    </div>`;
+
+  // stash for CSV export
+  window._lastResults = { rows, vars };
+}
+
+// ── CSV export ────────────────────────────────────────────────────────────────
+function downloadCSV(e) {
+  e.preventDefault();
+  const { rows, vars } = window._lastResults || {};
+  if (!rows) return;
+  const esc = v => '"' + (v || '').replace(/"/g, '""') + '"';
+  const csv = [
+    vars.map(esc).join(','),
+    ...rows.map(r => vars.map(v => esc(r[v] ? r[v].value : '')).join(','))
+  ].join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'sparql-results.csv';
+  a.click();
 }
 
 // ── Copy SPARQL ───────────────────────────────────────────────────────────────
 function copyQuery() {
-  navigator.clipboard.writeText(yasqe.getValue())
-    .then(() => {
-      const s = document.getElementById('status');
-      s.className = 'ok';
-      s.textContent = '✓ Copied to clipboard';
-    });
+  const q = document.getElementById('queryEditor').value;
+  navigator.clipboard.writeText(q).then(() => setStatus('ok', '✓ Copied to clipboard'));
 }
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function setStatus(cls, msg) {
+  const el = document.getElementById('status');
+  el.className = cls;
+  el.textContent = msg;
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+renderSources();
+document.getElementById('queryEditor').value = QUERIES[0];
 </script>
 
 </body>
