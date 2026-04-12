@@ -304,11 +304,23 @@ ORDER BY DESC(?case)`,
 }`,
 ];
 
+// ── Normalize legacy http:// RDF namespaces to their canonical form ───────────
+// Many FDP implementations use http://www.w3.org/ns/dcat# (pre-2020 form).
+// SPARQL queries use https://www.w3.org/ns/dcat# (current canonical form).
+// Replacing before load means queries work uniformly across all FDPs.
+function normalizeNamespaces(turtle) {
+  return turtle
+    .replaceAll('<http://www.w3.org/ns/dcat#',    '<https://www.w3.org/ns/dcat#')
+    .replaceAll('"http://www.w3.org/ns/dcat#',    '"https://www.w3.org/ns/dcat#')
+    .replaceAll('<http://www.w3.org/ns/ldp#',     '<https://www.w3.org/ns/ldp#')
+    .replaceAll('"http://www.w3.org/ns/ldp#',     '"https://www.w3.org/ns/ldp#');
+}
+
 // ── Initialize Oxigraph WASM ──────────────────────────────────────────────────
 let oxigraphReady = false;
 const oxigraphInit = (async () => {
   try {
-    await init('https://cdn.jsdelivr.net/npm/oxigraph/web_bg.wasm');
+    await init({ module_or_path: 'https://cdn.jsdelivr.net/npm/oxigraph/web_bg.wasm' });
     oxigraphReady = true;
     setStatus('', '');
     document.getElementById('runBtn').disabled = false;
@@ -366,7 +378,7 @@ async function runQuery() {
           failed.push(`${src.label} (HTTP ${res.status})`);
           continue;
         }
-        const text = await res.text();
+        const raw = await res.text();
         const ct = (res.headers.get('content-type') || '').split(';')[0].trim();
         // Determine format — prefer turtle, fall back gracefully
         let fmt = 'text/turtle';
@@ -374,7 +386,10 @@ async function runQuery() {
         else if (ct === 'application/n-triples') fmt = 'application/n-triples';
         else if (ct === 'application/n-quads')   fmt = 'application/n-quads';
 
-        store.load(text, fmt, src.url, null);
+        // Normalise legacy http:// DCAT/LDP namespaces → canonical https://
+        const text = (fmt === 'text/turtle') ? normalizeNamespaces(raw) : raw;
+
+        store.load(text, { format: fmt, base_iri: src.url });
         loadedCount++;
       } catch (e) {
         failed.push(`${src.label} (${e.message.slice(0, 60)})`);
