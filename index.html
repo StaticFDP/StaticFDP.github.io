@@ -1,1 +1,376 @@
-Soonish
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StaticFDP — FAIR Data Points on GitHub</title>
+  <meta name="description" content="StaticFDP turns GitHub repositories into FAIR Data Points: machine-readable, linked-data metadata endpoints for any dataset." />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --green:   #2ea44f;
+      --green-d: #22863a;
+      --blue:    #0969da;
+      --gray-1:  #f6f8fa;
+      --gray-2:  #eaeef2;
+      --gray-3:  #d0d7de;
+      --gray-7:  #57606a;
+      --gray-9:  #1f2328;
+      --purple:  #8250df;
+      --radius:  8px;
+    }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+           color: var(--gray-9); background: #fff; line-height: 1.6; }
+
+    /* ── Nav ── */
+    nav { background: var(--gray-9); color: #fff; padding: 0 2rem;
+          display: flex; align-items: center; gap: 1.5rem; height: 56px; }
+    nav .brand { font-weight: 700; font-size: 1.1rem; color: #fff; text-decoration: none; }
+    nav .brand span { color: var(--green); }
+    nav a { color: #ccc; text-decoration: none; font-size: .9rem; }
+    nav a:hover { color: #fff; }
+    nav .spacer { flex: 1; }
+
+    /* ── Hero ── */
+    .hero { background: linear-gradient(135deg, #0d1117 0%, #161b22 60%, #0d1117 100%);
+            color: #fff; text-align: center; padding: 5rem 2rem 4rem; }
+    .hero .badge { display: inline-block; background: rgba(46,164,79,.15); border: 1px solid rgba(46,164,79,.4);
+                   color: var(--green); border-radius: 20px; font-size: .8rem; padding: .25rem .75rem;
+                   margin-bottom: 1.5rem; letter-spacing: .04em; text-transform: uppercase; }
+    .hero h1 { font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 800; line-height: 1.15; margin-bottom: 1rem; }
+    .hero h1 em { color: var(--green); font-style: normal; }
+    .hero p { font-size: 1.15rem; color: #8b949e; max-width: 600px; margin: 0 auto 2.5rem; }
+    .btn { display: inline-block; padding: .65rem 1.4rem; border-radius: var(--radius);
+           font-weight: 600; font-size: .95rem; text-decoration: none; cursor: pointer; }
+    .btn-green  { background: var(--green); color: #fff; border: none; }
+    .btn-green:hover { background: var(--green-d); }
+    .btn-outline { background: transparent; color: #fff; border: 1px solid #444; }
+    .btn-outline:hover { border-color: #fff; }
+    .hero-btns { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+    /* ── Section shell ── */
+    section { padding: 4rem 2rem; }
+    .inner { max-width: 960px; margin: 0 auto; }
+    h2 { font-size: 1.6rem; font-weight: 700; margin-bottom: .5rem; }
+    .sub { color: var(--gray-7); margin-bottom: 2.5rem; font-size: 1rem; }
+    .alt { background: var(--gray-1); }
+
+    /* ── 4-card grid ── */
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem; }
+    .card { background: #fff; border: 1px solid var(--gray-3); border-radius: var(--radius); padding: 1.4rem; }
+    .card-icon { font-size: 1.8rem; margin-bottom: .75rem; }
+    .card h3 { font-size: 1rem; font-weight: 700; margin-bottom: .4rem; }
+    .card p  { font-size: .88rem; color: var(--gray-7); }
+
+    /* ── Step list ── */
+    .steps { display: flex; flex-direction: column; gap: 1.25rem; }
+    .step  { display: flex; gap: 1rem; align-items: flex-start; }
+    .step-num { flex-shrink: 0; width: 2rem; height: 2rem; border-radius: 50%;
+                background: var(--green); color: #fff; display: grid; place-items: center;
+                font-weight: 700; font-size: .9rem; }
+    .step-body h3 { font-weight: 600; margin-bottom: .2rem; }
+    .step-body p  { font-size: .9rem; color: var(--gray-7); }
+    .step-body code { background: var(--gray-2); padding: .1rem .35rem; border-radius: 4px;
+                      font-size: .82rem; }
+
+    /* ── FDP index panel ── */
+    .fdpi-panel { background: var(--gray-9); color: #fff; border-radius: var(--radius);
+                  padding: 2rem; margin-bottom: 2.5rem; }
+    .fdpi-panel h3 { color: #fff; font-size: 1.1rem; margin-bottom: .5rem; }
+    .fdpi-panel p  { color: #8b949e; font-size: .92rem; margin-bottom: 1.2rem; }
+    .fdpi-panel a.btn { margin-right: .5rem; }
+
+    /* ── Registered FDPs grid ── */
+    .fdp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; }
+    .fdp-card { border: 1px solid var(--gray-3); border-radius: var(--radius); padding: 1.2rem;
+                background: #fff; }
+    .fdp-card .fdp-title { font-weight: 700; font-size: .95rem; margin-bottom: .3rem; }
+    .fdp-card .fdp-desc  { font-size: .83rem; color: var(--gray-7); margin-bottom: .8rem; }
+    .fdp-card a { font-size: .83rem; color: var(--blue); text-decoration: none; }
+    .fdp-card a:hover { text-decoration: underline; }
+    .chip { display: inline-block; font-size: .72rem; font-weight: 600; border-radius: 12px;
+            padding: .15rem .5rem; margin-right: .3rem; margin-bottom: .4rem; }
+    .chip-green  { background: #d1f7dc; color: #116329; }
+    .chip-blue   { background: #ddf4ff; color: #0550ae; }
+    .chip-purple { background: #fbefff; color: #6639ba; }
+
+    /* ── Spec table ── */
+    table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+    th, td { text-align: left; padding: .6rem .8rem; border-bottom: 1px solid var(--gray-3); }
+    th { background: var(--gray-1); font-weight: 600; }
+    td code { font-size: .82rem; }
+
+    /* ── Demo section ── */
+    .demo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+    .demo-card { border: 1px solid var(--gray-3); border-radius: var(--radius); overflow: hidden; }
+    .demo-header { background: var(--gray-9); color: #fff; padding: 1rem 1.25rem; }
+    .demo-header h3 { font-size: 1rem; margin-bottom: .2rem; }
+    .demo-header p  { font-size: .8rem; color: #8b949e; }
+    .demo-body { padding: 1.25rem; }
+    .demo-body p { font-size: .88rem; color: var(--gray-7); margin-bottom: 1rem; }
+    .demo-body ul { padding-left: 1.2rem; font-size: .87rem; color: var(--gray-7); }
+    .demo-body li { margin-bottom: .3rem; }
+
+    /* ── Footer ── */
+    footer { background: var(--gray-1); border-top: 1px solid var(--gray-3);
+             text-align: center; padding: 2rem; font-size: .85rem; color: var(--gray-7); }
+    footer a { color: var(--blue); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+<!-- ── Nav ── -->
+<nav>
+  <a class="brand" href="/"><span>Static</span>FDP</a>
+  <a href="#how-it-works">How it works</a>
+  <a href="#registered-fdps">FDP Index</a>
+  <a href="#demos">Demos</a>
+  <a href="#get-started">Get started</a>
+  <div class="spacer"></div>
+  <a href="https://github.com/StaticFDP" target="_blank">GitHub ↗</a>
+</nav>
+
+<!-- ── Hero ── -->
+<div class="hero">
+  <div class="badge">Open · FAIR · Linked Data</div>
+  <h1>FAIR Data Points<br/><em>on GitHub</em></h1>
+  <p>Turn any GitHub repository into a machine-readable metadata endpoint — no server, no database, no infrastructure cost.</p>
+  <div class="hero-btns">
+    <a class="btn btn-green" href="#get-started">Get started →</a>
+    <a class="btn btn-outline" href="#registered-fdps">Browse the FDP Index</a>
+  </div>
+</div>
+
+<!-- ── What is a FAIR Data Point ── -->
+<section id="what-is-fdp">
+  <div class="inner">
+    <h2>What is a FAIR Data Point?</h2>
+    <p class="sub">A standardised, machine-readable metadata endpoint — based on the W3C DCAT vocabulary — that makes datasets <strong>F</strong>indable, <strong>A</strong>ccessible, <strong>I</strong>nteroperable, and <strong>R</strong>eusable.</p>
+    <div class="cards">
+      <div class="card">
+        <div class="card-icon">🔍</div>
+        <h3>Findable</h3>
+        <p>Persistent identifiers and rich metadata let search engines, data portals, and other FDPs discover your data automatically.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔓</div>
+        <h3>Accessible</h3>
+        <p>Open HTTP(S) endpoints anyone can query — no proprietary API keys, no sign-up, no institutional subscription.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔗</div>
+        <h3>Interoperable</h3>
+        <p>RDF Turtle + JSON-LD. Link directly to ontology terms (ORDO, OMIM, HPO, ICD…) using shared, open vocabularies.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">♻️</div>
+        <h3>Reusable</h3>
+        <p>DCAT-3 structured metadata, clear provenance, and explicit licences let others build on your work with confidence.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── How StaticFDP works ── -->
+<section id="how-it-works" class="alt">
+  <div class="inner">
+    <h2>How StaticFDP works</h2>
+    <p class="sub">GitHub as the canonical store — pull requests for peer review, Actions for validation, Pages for serving.</p>
+    <div class="cards">
+      <div class="card">
+        <div class="card-icon">📝</div>
+        <h3>1 — Write Turtle</h3>
+        <p>Metadata lives as RDF Turtle files in a GitHub repository. Human-readable, version-controlled, diffable.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">✅</div>
+        <h3>2 — Validate automatically</h3>
+        <p>GitHub Actions runs ShEx validation on every pull request. Invalid metadata is blocked before it merges.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🌐</div>
+        <h3>3 — Serve via Pages</h3>
+        <p>GitHub Pages serves the files at a stable URL with correct content-type headers — no backend needed.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🗂️</div>
+        <h3>4 — Index discovers you</h3>
+        <p>Register your FDP root URL and the FDP Index crawls it daily, making your datasets visible to the community.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FDP Index ── -->
+<section id="registered-fdps">
+  <div class="inner">
+    <div class="fdpi-panel">
+      <h3>🗂️ The FDP Index</h3>
+      <p>A daily-crawled registry of all registered StaticFDPs. Each entry shows datasets, catalogues, and metadata freshness. The index itself is a FAIR Data Point.</p>
+      <a class="btn btn-green" href="https://staticfdp.github.io/fdp-index/" target="_blank">Open the FDP Index →</a>
+      <a class="btn btn-outline" href="https://github.com/StaticFDP/fdp-index" target="_blank">View on GitHub</a>
+    </div>
+
+    <h2>Registered FDPs</h2>
+    <p class="sub">Community-maintained FAIR Data Points indexed by this platform.</p>
+    <div class="fdp-grid">
+
+      <div class="fdp-card">
+        <div class="fdp-title">Duchenne Data FDP</div>
+        <div class="fdp-desc">Disease trajectory datasets for Duchenne muscular dystrophy, structured with ORDO and HPO terms.</div>
+        <span class="chip chip-purple">Rare disease</span>
+        <span class="chip chip-blue">ORDO</span><br/>
+        <a href="https://staticfdp.github.io/duchenne-fdp/" target="_blank">Open FDP →</a>
+      </div>
+
+      <div class="fdp-card">
+        <div class="fdp-title">WikiPathways FDP</div>
+        <div class="fdp-desc">Biological pathway datasets from the WikiPathways open collaboration, exposed as FAIR metadata.</div>
+        <span class="chip chip-green">Pathways</span>
+        <span class="chip chip-blue">DCAT-3</span><br/>
+        <a href="https://staticfdp.github.io/wikipathways-fdp/" target="_blank">Open FDP →</a>
+      </div>
+
+      <div class="fdp-card">
+        <div class="fdp-title">SIB Swiss Institute FDP</div>
+        <div class="fdp-desc">Reference datasets from the Swiss Institute of Bioinformatics including UniProt and Rhea snapshots.</div>
+        <span class="chip chip-green">Bioinformatics</span>
+        <span class="chip chip-blue">RDF</span><br/>
+        <a href="https://staticfdp.github.io/sib-fdp/" target="_blank">Open FDP →</a>
+      </div>
+
+      <div class="fdp-card">
+        <div class="fdp-title">GA4GH BYOD Event FDP</div>
+        <div class="fdp-desc">Community submissions from the April 2026 Bring Your Own Disease event — rare disease trajectories and ontology gaps.</div>
+        <span class="chip chip-purple">Event</span>
+        <span class="chip chip-purple">Rare disease</span><br/>
+        <a href="/ga4gh-rare-disease-trajectories/" target="_blank">Event page →</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── Live Demos ── -->
+<section id="demos" class="alt">
+  <div class="inner">
+    <h2>Live demonstrations</h2>
+    <p class="sub">See StaticFDP in action — two concrete examples of what you can query and build once your metadata is FAIR.</p>
+    <div class="demo-grid">
+
+      <div class="demo-card">
+        <div class="demo-header">
+          <h3>🔎 SPARQL over the FDP Index</h3>
+          <p>Query all registered FDPs at once</p>
+        </div>
+        <div class="demo-body">
+          <p>Because every FDP publishes RDF, you can federate a SPARQL query across the entire index to find, for example, all datasets related to a given ORDO disease term.</p>
+          <ul>
+            <li>Find datasets by disease (ORDO / OMIM / ICD)</li>
+            <li>List all catalogues updated in the last 30 days</li>
+            <li>Discover cross-FDP licence compatibility</li>
+          </ul>
+          <br/>
+          <a class="btn btn-green" href="https://staticfdp.github.io/fdp-index/sparql-demo" target="_blank">Try the demo →</a>
+        </div>
+      </div>
+
+      <div class="demo-card">
+        <div class="demo-header">
+          <h3>🧬 Disease Trajectory Explorer</h3>
+          <p>Visualise community-contributed data</p>
+        </div>
+        <div class="demo-body">
+          <p>Community members submitted disease case data through the GA4GH BYOD forms. This demo reads those GitHub Issues as structured data and renders a comparative timeline of symptom onset across rare diseases.</p>
+          <ul>
+            <li>Submitted via ORCID-authenticated web forms</li>
+            <li>Stored as GitHub Issues — fully auditable</li>
+            <li>Automatically mirrored into the FDP metadata graph</li>
+          </ul>
+          <br/>
+          <a class="btn btn-green" href="/ga4gh-rare-disease-trajectories/" target="_blank">View the event page →</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── Get started ── -->
+<section id="get-started">
+  <div class="inner">
+    <h2>Register your own FDP</h2>
+    <p class="sub">Four steps from zero to a fully indexed, validated FAIR Data Point.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h3>Use a StaticFDP template</h3>
+          <p>Click <strong>Use this template</strong> on <a href="https://github.com/StaticFDP/staticfdp-template">github.com/StaticFDP/staticfdp-template</a> to create your own repository with the right folder structure and workflows pre-configured.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h3>Edit your metadata</h3>
+          <p>Open <code>fdp/catalog.ttl</code> and fill in your dataset details. Use standard prefixes: <code>dcat:</code>, <code>dcterms:</code>, <code>ordo:</code>, <code>hpo:</code>. Every save triggers ShEx validation.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h3>Enable GitHub Pages</h3>
+          <p>Go to Settings → Pages → Source: <em>main branch / docs folder</em>. Your FDP will be live at <code>https://&lt;org&gt;.github.io/&lt;repo&gt;/</code> within minutes.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h3>Register in the FDP Index</h3>
+          <p>Open a pull request adding your URL to <a href="https://github.com/StaticFDP/fdp-index/blob/main/registry.yaml">registry.yaml</a>. Once merged, the daily crawl picks you up automatically — or ping the index immediately with a <code>repository_dispatch</code> event.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Specs & tools ── -->
+<section class="alt">
+  <div class="inner">
+    <h2>Specifications &amp; tools</h2>
+    <p class="sub">Standards StaticFDP builds on.</p>
+    <table>
+      <thead>
+        <tr><th>Standard / tool</th><th>Role</th><th>Link</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>FAIR Data Point specification</td><td>Defines the HTTP API and metadata model</td><td><a href="https://specs.fairdatapoint.org" target="_blank">specs.fairdatapoint.org</a></td></tr>
+        <tr><td>DCAT-3</td><td>Core vocabulary for datasets, catalogues, distributions</td><td><a href="https://www.w3.org/TR/vocab-dcat-3/" target="_blank">w3.org</a></td></tr>
+        <tr><td>RDF Turtle</td><td>Human-friendly RDF serialisation</td><td><a href="https://www.w3.org/TR/turtle/" target="_blank">w3.org</a></td></tr>
+        <tr><td>ShEx</td><td>Primary schema validation language</td><td><a href="https://shex.io" target="_blank">shex.io</a></td></tr>
+        <tr><td>ORDO / Orphanet</td><td>Primary rare disease ontology</td><td><a href="https://www.orphadata.com" target="_blank">orphadata.com</a></td></tr>
+        <tr><td>HPO</td><td>Human Phenotype Ontology for clinical features</td><td><a href="https://hpo.jax.org" target="_blank">hpo.jax.org</a></td></tr>
+        <tr><td>Cloudflare Workers</td><td>OAuth-authenticated form submission without GitHub accounts</td><td><a href="https://workers.cloudflare.com" target="_blank">workers.cloudflare.com</a></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ── Footer ── -->
+<footer>
+  <p>
+    <strong>StaticFDP</strong> · FAIR Data Points on GitHub ·
+    <a href="https://github.com/StaticFDP" target="_blank">GitHub organisation</a> ·
+    <a href="https://staticfdp.github.io/fdp-index/" target="_blank">FDP Index</a> ·
+    <a href="https://specs.fairdatapoint.org" target="_blank">FDP Specification</a>
+  </p>
+  <p style="margin-top:.5rem; color: #999;">
+    Content on this site is available under
+    <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a>.
+    Code under <a href="https://opensource.org/licenses/MIT" target="_blank">MIT</a>.
+  </p>
+</footer>
+
+</body>
+</html>
