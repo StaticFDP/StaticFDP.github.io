@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FDP ecosystems — StaticFDP</title>
+  <meta name="description" content="Start your own FAIR Data Point ecosystem on GitHub: a template that describes every way to get each resource, with self-service contributions, contributor credit and FAIR assessment. Browse the ecosystems built with it." />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --green:   #2ea44f;
+      --green-d: #22863a;
+      --blue:    #0969da;
+      --gray-1:  #f6f8fa;
+      --gray-2:  #eaeef2;
+      --gray-3:  #d0d7de;
+      --gray-7:  #57606a;
+      --gray-9:  #1f2328;
+      --purple:  #8250df;
+      --radius:  8px;
+    }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+           color: var(--gray-9); background: #fff; line-height: 1.6; }
+
+    /* ── Nav ── */
+    nav { background: #1a4a8a; color: #fff; padding: 0 2rem;
+          display: flex; align-items: center; gap: 1.5rem; height: 56px; }
+    nav .brand { font-weight: 700; font-size: 1.05rem; color: #fff; text-decoration: none;
+                 display: flex; align-items: center; gap: .5rem; }
+    nav .brand img { height: 30px; border-radius: 4px; }
+    nav .brand span { color: rgba(255,255,255,.65); font-weight: 400; font-size: .88em; }
+    nav a { color: rgba(255,255,255,.8); text-decoration: none; font-size: .9rem; }
+    nav a:hover { color: #fff; }
+    nav .spacer { flex: 1; }
+
+    /* ── Hero ── */
+    .hero { background: linear-gradient(135deg, #0d1117 0%, #161b22 60%, #0d1117 100%);
+            color: #fff; text-align: center; padding: 5rem 2rem 4rem; }
+    .hero .badge { display: inline-block; background: rgba(46,164,79,.15); border: 1px solid rgba(46,164,79,.4);
+                   color: var(--green); border-radius: 20px; font-size: .8rem; padding: .25rem .75rem;
+                   margin-bottom: 1.5rem; letter-spacing: .04em; text-transform: uppercase; }
+    .hero h1 { font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 800; line-height: 1.15; margin-bottom: 1rem; }
+    .hero h1 em { color: var(--green); font-style: normal; }
+    .hero p { font-size: 1.15rem; color: #8b949e; max-width: 600px; margin: 0 auto 2.5rem; }
+    .btn { display: inline-block; padding: .65rem 1.4rem; border-radius: var(--radius);
+           font-weight: 600; font-size: .95rem; text-decoration: none; cursor: pointer; }
+    .btn-green  { background: var(--green); color: #fff; border: none; }
+    .btn-green:hover { background: var(--green-d); }
+    .btn-outline { background: transparent; color: #fff; border: 1px solid #444; }
+    .btn-outline:hover { border-color: #fff; }
+    .hero-btns { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+    /* ── Section shell ── */
+    section { padding: 4rem 2rem; }
+    .inner { max-width: 960px; margin: 0 auto; }
+    h2 { font-size: 1.6rem; font-weight: 700; margin-bottom: .5rem; }
+    .sub { color: var(--gray-7); margin-bottom: 2.5rem; font-size: 1rem; }
+    .alt { background: var(--gray-1); }
+
+    /* ── 4-card grid ── */
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem; }
+    .card { background: #fff; border: 1px solid var(--gray-3); border-radius: var(--radius); padding: 1.4rem; }
+    .card-icon { font-size: 1.8rem; margin-bottom: .75rem; }
+    .card h3 { font-size: 1rem; font-weight: 700; margin-bottom: .4rem; }
+    .card p  { font-size: .88rem; color: var(--gray-7); }
+
+    /* ── Step list ── */
+    .steps { display: flex; flex-direction: column; gap: 1.25rem; }
+    .step  { display: flex; gap: 1rem; align-items: flex-start; }
+    .step-num { flex-shrink: 0; width: 2rem; height: 2rem; border-radius: 50%;
+                background: var(--green); color: #fff; display: grid; place-items: center;
+                font-weight: 700; font-size: .9rem; }
+    .step-body h3 { font-weight: 600; margin-bottom: .2rem; }
+    .step-body p  { font-size: .9rem; color: var(--gray-7); }
+    .step-body code { background: var(--gray-2); padding: .1rem .35rem; border-radius: 4px;
+                      font-size: .82rem; }
+
+    /* ── FDP index panel ── */
+    .fdpi-panel { background: var(--gray-9); color: #fff; border-radius: var(--radius);
+                  padding: 2rem; margin-bottom: 2.5rem; }
+    .fdpi-panel h3 { color: #fff; font-size: 1.1rem; margin-bottom: .5rem; }
+    .fdpi-panel p  { color: #8b949e; font-size: .92rem; margin-bottom: 1.2rem; }
+    .fdpi-panel a.btn { margin-right: .5rem; }
+
+    /* ── Registered FDPs grid ── */
+    .fdp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; }
+    .fdp-card { border: 1px solid var(--gray-3); border-radius: var(--radius); padding: 1.2rem;
+                background: #fff; }
+    .fdp-card .fdp-title { font-weight: 700; font-size: .95rem; margin-bottom: .3rem; }
+    .fdp-card .fdp-desc  { font-size: .83rem; color: var(--gray-7); margin-bottom: .8rem; }
+    .fdp-card a { font-size: .83rem; color: var(--blue); text-decoration: none; }
+    .fdp-card a:hover { text-decoration: underline; }
+    .chip { display: inline-block; font-size: .72rem; font-weight: 600; border-radius: 12px;
+            padding: .15rem .5rem; margin-right: .3rem; margin-bottom: .4rem; }
+    .chip-green  { background: #d1f7dc; color: #116329; }
+    .chip-blue   { background: #ddf4ff; color: #0550ae; }
+    .chip-purple { background: #fbefff; color: #6639ba; }
+
+    /* ── Spec table ── */
+    table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+    th, td { text-align: left; padding: .6rem .8rem; border-bottom: 1px solid var(--gray-3); }
+    th { background: var(--gray-1); font-weight: 600; }
+    td code { font-size: .82rem; }
+
+    /* ── Demo section ── */
+    .demo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+    .demo-card { border: 1px solid var(--gray-3); border-radius: var(--radius); overflow: hidden; }
+    .demo-header { background: var(--gray-9); color: #fff; padding: 1rem 1.25rem; }
+    .demo-header h3 { font-size: 1rem; margin-bottom: .2rem; }
+    .demo-header p  { font-size: .8rem; color: #8b949e; }
+    .demo-body { padding: 1.25rem; }
+    .demo-body p { font-size: .88rem; color: var(--gray-7); margin-bottom: 1rem; }
+    .demo-body ul { padding-left: 1.2rem; font-size: .87rem; color: var(--gray-7); }
+    .demo-body li { margin-bottom: .3rem; }
+
+    /* ── Footer ── */
+    footer { background: var(--gray-1); border-top: 1px solid var(--gray-3);
+             text-align: center; padding: 2rem; font-size: .85rem; color: var(--gray-7); }
+    footer a { color: var(--blue); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+  
+    .eco-hero { background: linear-gradient(135deg, #1a4a8a 0%, #24507a 55%, #1d5c38 100%); color: #fff; padding: 4rem 2rem 3.5rem; text-align: center; }
+    .eco-hero h1 { font-size: 2.4rem; line-height: 1.15; margin-bottom: .9rem; }
+    .eco-hero p { max-width: 640px; margin: 0 auto 1.6rem; color: #d7e3f2; font-size: 1.05rem; }
+    .eco-hero .btn-outline { border-color: rgba(255,255,255,.55); color: #fff; }
+    .eco-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; margin-top: 1.5rem; }
+    .eco-card { border: 1px solid var(--gray-3); border-radius: var(--radius); background: #fff; padding: 1.3rem; display: flex; flex-direction: column; gap: .55rem; }
+    .eco-card h3 { font-size: 1.05rem; }
+    .eco-card p { font-size: .9rem; color: var(--gray-7); }
+    .eco-card .links { margin-top: auto; display: flex; gap: .9rem; flex-wrap: wrap; font-size: .9rem; font-weight: 600; }
+    .eco-swatch { width: 38px; height: 38px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+    .eco-swatch svg { width: 24px; height: 24px; }
+    .feature-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: .9rem 1.5rem; margin-top: 1.25rem; }
+    .feature-list div { font-size: .92rem; color: var(--gray-7); }
+    .feature-list strong { color: var(--gray-9); display: block; }
+    @media (max-width: 600px) { .eco-hero h1 { font-size: 1.8rem; } }
+      /* Phones: the nav scrolls inside its own bar instead of widening the page. */
+    @media (max-width: 760px) {
+      nav { overflow-x: auto; padding: 0 1rem; gap: 1rem; }
+      nav a, nav .brand { white-space: nowrap; flex-shrink: 0; }
+    }
+</style>
+</head>
+<body>
+
+<!-- ── Nav ── -->
+<nav>
+  <a class="brand" href="/"><img src="https://koetai.semscape.org/static/anableps.jpg" alt="Koetai">Koetai <span>FAIR Data Points</span></a>
+  <a href="/#how-it-works">How it works</a>
+  <a href="/#registered-fdps">Registered FDPs</a>
+  <a href="/#demos">Demos</a>
+  <a href="/#get-started">Get started</a>
+  <a href="/ecosystems/" aria-current="page"><strong>Ecosystems</strong></a>
+  <div class="spacer"></div>
+  <a href="https://github.com/StaticFDP" target="_blank">GitHub ↗</a>
+</nav>
+
+<div class="eco-hero">
+  <h1>Start your own FDP ecosystem</h1>
+  <p>A FAIR Data Point that describes <strong>every way to get each resource</strong> (portals, APIs, SPARQL endpoints, dumps, cloud buckets, copies in aggregators), served from a GitHub repository. No server, and free for public repositories.</p>
+  <div class="hero-btns">
+    <a class="btn btn-green" href="https://github.com/new?template_owner=StaticFDP&amp;template_name=fdp-ecosystem-template">Use the template →</a>
+    <a class="btn btn-outline" href="https://fdp.semscape.org/fdp-ecosystem-template/">See the demo</a>
+  </div>
+</div>
+
+<section id="start">
+  <div class="inner">
+    <h2>Three steps</h2>
+    <p class="sub">From nothing to a live, validated, FAIR-assessed FDP in a few minutes.</p>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-body">
+        <h3>Create your repository</h3>
+        <p><a href="https://github.com/new?template_owner=StaticFDP&amp;template_name=fdp-ecosystem-template">Use the template</a> to create a <strong>public</strong> repository from <a href="https://github.com/StaticFDP/fdp-ecosystem-template">StaticFDP/fdp-ecosystem-template</a>.</p>
+      </div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-body">
+        <h3>Switch on GitHub Pages</h3>
+        <p>In the new repository: <em>Settings → Pages → Source: GitHub Actions</em>. Then run <em>Actions → Deploy viewer to GitHub Pages</em>. The first deploy points the configuration and every IRI at your repository.</p>
+      </div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-body">
+        <h3>Make it yours</h3>
+        <p>Edit <code>fdp.config.json</code> (name, headline, colours, fonts, maintainer) and <code>assets/logo.svg</code>. Replace the example source, then add sources through the <em>Add a data source</em> issue form. Optionally <a href="#registry">register your FDP in the FDP Index</a>.</p>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<section id="ecosystems" class="alt">
+  <div class="inner">
+    <h2>Ecosystems built with it</h2>
+    <p class="sub">Each one is its own repository and website, and all share the same engine.</p>
+    <div class="eco-grid">
+      <div class="eco-card">
+        <div class="eco-swatch" style="background:#1d5c38"><svg viewBox="0 0 24 24" style="color:#fff"><g fill="currentColor"><circle cx="7" cy="7.2" r="3.6"/><circle cx="12" cy="5.4" r="4.2"/><circle cx="17" cy="7.2" r="3.6"/><rect x="5" y="7" width="14" height="3.6" rx="1.8"/></g><path d="M12 10V20.5M12 11.8C8 11.8 4.6 14 3.2 20.5M12 11.8C16 11.8 19.4 14 20.8 20.5M11.6 13.4C9.4 14 7.6 16.4 7.2 20.5M12.4 13.4C14.6 14 16.4 16.4 16.8 20.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" fill="none"/></svg></div>
+        <h3>Biodiversity FDP</h3>
+        <p>Every way to get biodiversity data: iNaturalist, GBIF, BHL, Plazi, UniProt, OpenStreetMap, GeoNames and the FLAIR-GG germplasm banks. That's 8 sources and 117 ways to reach them.</p>
+        <div class="links"><a href="https://koetai.github.io/biodiversity-fdp/">Visit →</a><a href="https://github.com/Koetai/biodiversity-fdp">Source</a></div>
+      </div>
+      <div class="eco-card">
+        <div class="eco-swatch" style="background:#24507a"><svg viewBox="0 0 24 24" style="color:#fff"><path d="M12 2.8 21.2 7.4 12 12 2.8 7.4Z" fill="currentColor"/><path d="M2.8 12 12 16.6 21.2 12M2.8 16.6 12 21.2 21.2 16.6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
+        <h3>FDP Ecosystem Template</h3>
+        <p>The template itself, running as a demo with one example source (Wikidata) so you can see every feature before you start.</p>
+        <div class="links"><a href="https://fdp.semscape.org/fdp-ecosystem-template/">Visit →</a><a href="https://github.com/StaticFDP/fdp-ecosystem-template">Source</a></div>
+      </div>
+      <div class="eco-card" style="border-style:dashed">
+        <div class="eco-swatch" style="background:var(--gray-2); color:var(--gray-7); font-size:1.5rem; font-weight:700">+</div>
+        <h3>Yours next</h3>
+        <p>Built one? Open an issue on the template repository and it will be listed here.</p>
+        <div class="links"><a href="https://github.com/new?template_owner=StaticFDP&amp;template_name=fdp-ecosystem-template">Use the template →</a><a href="https://github.com/StaticFDP/fdp-ecosystem-template/issues/new?title=List%20my%20FDP%20ecosystem">List mine</a></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="features">
+  <div class="inner">
+    <h2>What every ecosystem gets</h2>
+    <div class="feature-list">
+      <div><strong>A website from Turtle</strong>Index → catalog → dataset → ways to get it, with search, access-method filters, and light and dark mode. Static HTML and schema.org JSON-LD for search engines.</div>
+      <div><strong>Every way to get the data</strong>Each distribution is typed with an access method (SPARQL, REST, dump, cloud bucket, aggregator copy, …) and has a "How to get it" recipe.</div>
+      <div><strong>Live FAIR Data Points</strong>Link someone else's FDP; the site crawls it in the browser and stays current.</div>
+      <div><strong>Self-service contributions</strong>An issue form becomes a validated pull request. No Turtle needed.</div>
+      <div><strong>Contributor credit</strong>From commits, pull requests and form submissions, with names, Wikidata items and ORCID iDs from Wikidata (P2037). Published in RDF too.</div>
+      <div><strong>FAIR assessment</strong>Walks every level of the FDP and runs the OSTrails FAIR Champion tests: weekly, after deploys and on demand.</div>
+      <div><strong>Validation</strong>Every push checks the Turtle syntax, the DCAT shape, the vocabulary terms and the consistency of the index.</div>
+      <div><strong>Engine updates</strong>Your content stays yours; template improvements arrive as a pull request.</div>
+    </div>
+  </div>
+</section>
+
+<section id="registry" class="alt">
+  <div class="inner">
+    <h2>Make it discoverable</h2>
+    <p class="sub">Register your ecosystem's index in the <a href="https://fdp.semscape.org/fdp-index/">FDP Index</a> by adding it to <a href="https://github.com/StaticFDP/fdp-index/blob/main/registry.yaml">registry.yaml</a>. For persistent identifiers, register a <a href="https://w3id.org">w3id</a> and run <code>scripts/set-base.sh https://w3id.org/&lt;your-id&gt;/</code>.</p>
+  </div>
+</section>
+
+<footer>
+  <p>
+    <strong>StaticFDP</strong> · <a href="https://github.com/StaticFDP" target="_blank">FAIR Data Points on GitHub</a> ·
+    <a href="https://github.com/StaticFDP" target="_blank">GitHub organisation</a> ·
+    <a href="https://fdp.semscape.org/fdp-index/" target="_blank">FDP Index</a> ·
+    <a href="https://specs.fairdatapoint.org" target="_blank">FDP Specification</a>
+  </p>
+  <p style="margin-top:.5rem; color: #999;">
+    The platform code is available under the
+    <a href="https://opensource.org/licenses/MIT" target="_blank">MIT License</a>.
+    Structured data aggregated from registered FAIR Data Points is available under the
+    license declared by each source dataset — terms may vary.
+    Where no license is stated, please contact the data provider directly.
+  </p>
+</footer>
+
+</body>
+</html>

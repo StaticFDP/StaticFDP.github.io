@@ -118,7 +118,13 @@
              text-align: center; padding: 2rem; font-size: .85rem; color: var(--gray-7); }
     footer a { color: var(--blue); text-decoration: none; }
     footer a:hover { text-decoration: underline; }
-  </style>
+      /* Phones: the nav scrolls inside its own bar instead of widening the page. */
+    @media (max-width: 760px) {
+      nav { overflow-x: auto; padding: 0 1rem; gap: 1rem; }
+      nav a, nav .brand { white-space: nowrap; flex-shrink: 0; }
+      table { display: block; overflow-x: auto; }
+    }
+</style>
 </head>
 <body>
 
@@ -129,6 +135,7 @@
   <a href="#registered-fdps">Registered FDPs</a>
   <a href="#demos">Demos</a>
   <a href="#get-started">Get started</a>
+  <a href="/ecosystems/">Ecosystems</a>
   <div class="spacer"></div>
   <a href="https://github.com/StaticFDP" target="_blank">GitHub ↗</a>
 </nav>
@@ -141,6 +148,7 @@
   <div class="hero-btns">
     <a class="btn btn-green" href="#get-started">Get started →</a>
     <a class="btn btn-outline" href="#registered-fdps">Browse the FDP Index</a>
+    <a class="btn btn-outline" href="/ecosystems/">Start an FDP ecosystem</a>
   </div>
 </div>
 
@@ -310,8 +318,8 @@
       <div class="step">
         <div class="step-num">1</div>
         <div class="step-body">
-          <h3>Use a StaticFDP template</h3>
-          <p>Click <strong>Use this template</strong> on <a href="https://github.com/StaticFDP/staticfdp-template">github.com/StaticFDP/staticfdp-template</a> to create your own repository with the right folder structure and workflows pre-configured.</p>
+          <h3>Use the FDP ecosystem template</h3>
+          <p>Click <strong>Use this template</strong> on <a href="https://github.com/StaticFDP/fdp-ecosystem-template">github.com/StaticFDP/fdp-ecosystem-template</a>, or follow the <a href="/ecosystems/">three-step guide</a>. You get the folder structure, validation, a website, self-service contributions and FAIR assessment, all pre-configured.</p>
         </div>
       </div>
       <div class="step">
@@ -365,6 +373,7 @@
     <strong>StaticFDP</strong> · <a href="https://github.com/StaticFDP" target="_blank">FAIR Data Points on GitHub</a> ·
     <a href="https://github.com/StaticFDP" target="_blank">GitHub organisation</a> ·
     <a href="https://fdp.semscape.org/fdp-index/" target="_blank">FDP Index</a> ·
+    <a href="/ecosystems/">FDP ecosystems</a> ·
     <a href="https://specs.fairdatapoint.org" target="_blank">FDP Specification</a>
   </p>
   <p style="margin-top:.5rem; color: #999;">
